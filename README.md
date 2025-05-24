@@ -1,8 +1,5 @@
 # Vionex
 
-[![Repo Size](https://img.shields.io/github/repo-size/suhasbm09/Vionex)](https://github.com/suhasbm09/Vionex)  
-[![License](https://img.shields.io/github/license/suhasbm09/Vionex)](https://github.com/suhasbm09/Vionex/blob/main/LICENSE)
-
 A **decentralized**, **AI-powered** platform bridging surplus and scarcity in healthcare.  
 Donors can contribute medicines, and NGOs request exactly what they need—the matching is handled by an AI microservice and all transactions (confirmations & feedback) are immutably logged on Solana Devnet.
 
