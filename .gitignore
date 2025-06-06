@@ -13,11 +13,19 @@ Desktop.ini
 .vscode/
 __pycache__/
 *.py[cod]
+.idea/
 
 # ------------------------------
 # AI Matcher (Python)
 # ------------------------------
 backend/ai_matcher/venv/
+backend/node_modules/
+ai_matcher/* linguist-vendored
+backend/ai_matcher/*.pyc
+backend/ai_matcher/__pycache__/
+backend/ai_matcher/*.pyo
+backend/ai_matcher/*.pyd
+
 
 # ------------------------------
 # Firebase and Backend Secrets
