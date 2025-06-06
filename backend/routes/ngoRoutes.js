@@ -1,13 +1,17 @@
 // backend/routes/ngoRoutes.js
 const express = require('express');
-const c       = require('../controllers/ngoController');
+const ngoCtrl = require('../controllers/ngoController');
+const reqCtrl = require('../controllers/requestController');
 const router  = express.Router();
 
-router.post('/profile',                   c.createNgoProfile);
-router.get('/email/:email',               c.getNgoByEmail);
-router.get('/:id/matches',                c.getNgoMatches);
-router.get('/request/:requestId',         c.getNgoRequest);
-router.post('/request/:requestId/confirm',c.confirmNgoRequest);
-router.post('/request/:requestId/feedback',c.sendNgoFeedback);
+// NGO profile & matching
+router.post('/profile',        ngoCtrl.createNgoProfile);
+router.get('/email/:email',    ngoCtrl.getNgoByEmail);
+router.get('/:id/matches',     ngoCtrl.getNgoMatches);
+
+// Request flow
+router.get('/request/:id',         reqCtrl.getRequest);
+router.post('/request/:id/confirm', reqCtrl.confirmRequest);
+router.post('/request/:id/feedback',reqCtrl.sendFeedback);
 
 module.exports = router;

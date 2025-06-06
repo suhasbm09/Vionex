@@ -1,23 +1,29 @@
 // src/components/Layout.jsx
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import Header from './Header'
-import Footer from './Footer'
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#00121F] to-[#002F34] text-white relative overflow-x-hidden">
-      {/* Animated background blobs */}
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-teal-600 opacity-20 rounded-full animate-spin-slow" />
-      <div className="absolute -bottom-28 -right-24 w-96 h-96 bg-orange-500 opacity-15 rounded-full animate-pulse-slow" />
+    <div className="min-h-screen flex flex-col text-white relative bg-black/70 overflow-x-hidden">
 
+      {/* 🔲 Optional grid overlay */}
+      <div className="absolute inset-0 z-0 bg-dot-grid pointer-events-none" />
+
+      {/* 💫 Gradient overlay (in CSS) */}
+      <div className="absolute inset-0 z-[-1]"></div>
+
+      {/* 🔝 Header */}
       <Header />
 
-      <main className="flex-grow pt-24 px-4 sm:px-8 pb-12">
+      {/* 📦 Main content */}
+      <main className="flex-grow pt-30 px-4 sm:px-8  animate-fade-in">
         <Outlet />
       </main>
 
+      {/* 🔚 Footer */}
       <Footer />
     </div>
-  )
+  );
 }

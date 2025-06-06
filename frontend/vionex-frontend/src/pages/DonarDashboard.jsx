@@ -1,144 +1,128 @@
-// src/pages/DonorDashboard.jsx
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import dayjs from 'dayjs'
-import { useLocation, Navigate, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { PlusCircle, LogOut, User } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { Navigate, useNavigate } from 'react-router-dom';
 
-const DonorDashboard = () => {
-  const navigate = useNavigate()
-  const { state } = useLocation()
-  const stored = JSON.parse(localStorage.getItem('user') || '{}')
-  const donorId = state?.id || stored?.id
-  if (!donorId) return <Navigate to="/" replace />
+export default function DonorDashboard() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const donorId = user.id;
+  if (!donorId) return <Navigate to="/" replace />;
 
-  const [donations, setDonations] = useState([])
-  const [showForm, setShowForm] = useState(false)
+  const [donations, setDonations] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     medicineName: '',
     quantity: '',
-    expiryDate: ''
-  })
+    expiryDate: '',
+  });
 
-  // fetch donations
   useEffect(() => {
     axios
       .get(`http://localhost:5000/donor/${donorId}/donations`)
-      .then(res => setDonations(res.data.donations || []))
-      .catch(() => alert('Unable to load donations.'))
-  }, [donorId])
+      .then((res) => {
+        setDonations(res.data.donations.filter((d) => d.status !== 'Delivered'));
+      })
+      .catch(() => alert('Could not load donations.'));
+  }, [donorId]);
 
-  // form handlers
-  const handleChange = e => {
-    const { name, value } = e.target
-    setForm(f => ({ ...f, [name]: value }))
-  }
-  const handleSubmit = e => {
-    e.preventDefault()
+  const getTag = (expiry) => {
+    const diff = dayjs(expiry).diff(dayjs(), 'day');
+    if (diff < 0) return 'Expired';
+    if (diff <= 7) return 'Expiring Soon';
+    return 'Active';
+  };
+
+  const total = donations.reduce((sum, d) => sum + Number(d.quantity), 0);
+
+  const handleChange = (e) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
     axios
       .post(`http://localhost:5000/donor/${donorId}/donations`, form)
-      .then(res => {
-        setDonations(d => [res.data, ...d])
-        setForm({ medicineName: '', quantity: '', expiryDate: '' })
-        setShowForm(false)
+      .then((r) => {
+        setDonations((arr) => [r.data, ...arr]);
+        setForm({ medicineName: '', quantity: '', expiryDate: '' });
+        setDrawerOpen(false);
       })
-      .catch(() => alert('Could not save donation.'))
-  }
+      .catch(() => alert('Save failed.'))
+      .finally(() => setLoading(false));
+  };
 
-  // status tag logic
-  const getTag = expiry => {
-    const diff = dayjs(expiry).diff(dayjs(), 'day')
-    if (diff < 0) return 'Expired'
-    if (diff <= 7) return 'Expiring Soon'
-    return 'Active'
-  }
-  const totalDonations = donations.reduce((sum, d) => sum + Number(d.quantity), 0)
+  const confirmHandover = async (donationId) => {
+    try {
+      await axios.patch(`http://localhost:5000/donor/${donationId}/donations/confirm`);
+      setDonations((arr) => arr.filter((d) => d.id !== donationId));
+    } catch {
+      alert('Confirm failed');
+    }
+  };
 
-  // logout
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    navigate('/', { replace: true })
-  }
+  const logout = () => {
+    localStorage.removeItem('user');
+    navigate('/', { replace: true });
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[#00121F] to-[#002F34] text-white"
-    >
-      {/* Animated background blobs */}
-      <div className="absolute top-[-120px] left-[-100px] w-96 h-96 bg-teal-600 opacity-20 rounded-full animate-spin-slow" />
-      <div className="absolute bottom-[-140px] right-[-120px] w-96 h-96 bg-orange-500 opacity-15 rounded-full animate-pulse-slow" />
+    <div className="min-h-screen text-white px-6 py-10 relative">
+      <div className=" container-75 mx-full space-y-12 animate-slide-up">
 
-      {/* Top Nav */}
-      <div className="relative z-10 flex justify-end p-6 space-x-4 items-center">
-        <User size={20} className="text-gray-300" />
-        <span className="font-medium">{stored.displayName}</span>
-        <button
-          onClick={handleLogout}
-          className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
-          title="Logout"
-        >
-          <LogOut size={18} />
-        </button>
-      </div>
-
-      <div className="relative z-10 px-6 pb-12">
-        {/* Page Title */}
-        <motion.h1
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="text-4xl font-bold mb-6 text-center"
-        >
-          📦 Donor Dashboard
-        </motion.h1>
-
-        {/* Summary Card */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="max-w-md mx-auto bg-white/10 backdrop-blur-lg p-6 rounded-3xl shadow-2xl mb-8 flex justify-between items-center"
-        >
-          <div>
-            <p className="text-gray-300">Total Donated</p>
-            <p className="text-3xl font-semibold">{totalDonations}</p>
-          </div>
-          <PlusCircle size={48} className="text-teal-400" />
-        </motion.div>
-
-        {/* New Donation Section */}
-        <div className="max-w-md mx-auto mb-8">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold tracking-wide">
+            📦 Donor Dashboard
+          </h1>
           <button
-            onClick={() => setShowForm(s => !s)}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-semibold transition"
+            onClick={logout}
+            className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl hover:scale-105 transition-all shadow-md"
           >
-            {showForm ? '✕ Cancel' : <><PlusCircle /> New Donation</>}
+            Logout
           </button>
+        </div>
 
-          {showForm && (
-            <motion.form
-              onSubmit={handleSubmit}
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="mt-4 space-y-4 bg-gray-800 p-6 rounded-2xl"
-            >
+        {/* Summary Badge */}
+        <div className="glass flex items-center justify-between px-8 py-6 rounded-2xl shadow-lg">
+          <div>
+            <p className="text-gray-400">Total Quantity Donated</p>
+            <p className="text-4xl font-semibold text-cyan-400">{total}</p>
+          </div>
+          <div className="text-6xl animate-bounce-slow">🎁</div>
+        </div>
+
+        {/* Add Donation Button */}
+        <div className="text-right">
+          <button
+            onClick={() => setDrawerOpen((o) => !o)}
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-full font-semibold shadow-lg transition-transform hover:scale-105"
+          >
+            {drawerOpen ? '✕ Cancel' : '+ Add Donation'}
+          </button>
+        </div>
+
+        {/* Add Donation Form */}
+        {drawerOpen && (
+          <div className="glass p-8 rounded-2xl max-w-xl mx-auto shadow-xl border border-white/10">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <input
                 name="medicineName"
+                placeholder="Medicine Name"
                 value={form.medicineName}
                 onChange={handleChange}
-                placeholder="Medicine Name"
                 required
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 transition"
+                className="w-full px-4 py-2 bg-gray-900 rounded-xl border border-white/10 text-white"
               />
               <input
                 name="quantity"
                 type="number"
+                placeholder="Quantity"
                 value={form.quantity}
                 onChange={handleChange}
-                placeholder="Quantity"
                 required
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 transition"
+                className="w-full px-4 py-2 bg-gray-900 rounded-xl border border-white/10 text-white"
               />
               <input
                 name="expiryDate"
@@ -146,68 +130,69 @@ const DonorDashboard = () => {
                 value={form.expiryDate}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:ring-2 focus:ring-teal-400 transition"
+                className="w-full px-4 py-2 bg-gray-900 rounded-xl border border-white/10 text-white"
               />
               <button
                 type="submit"
-                className="w-full py-2 bg-green-600 hover:bg-green-500 rounded-lg font-semibold transition"
+                disabled={loading}
+                className="w-full py-3 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white rounded-xl hover:scale-105 transition-all disabled:opacity-50"
               >
-                Submit
+                {loading ? 'Saving…' : 'Save Donation'}
               </button>
-            </motion.form>
+            </form>
+          </div>
+        )}
+
+        {/* Donation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {donations.length === 0 && (
+            <p className="text-center text-gray-400 col-span-full">No pending donations.</p>
           )}
-        </div>
 
-        {/* Donations List */}
-        <div className="max-w-2xl mx-auto space-y-4">
-          {donations.length === 0 ? (
-            <p className="text-center text-gray-400">
-              You haven’t created any donations yet.
-            </p>
-          ) : (
-            donations.map(d => (
-              <motion.div
-                key={d.id}
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                className="p-4 bg-white/10 backdrop-blur-sm rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-lg"
-              >
+          {donations.map((d) => (
+            <div
+              key={d.id}
+              className="glass p-6 rounded-2xl shadow-md border border-white/10 flex flex-col justify-between hover:shadow-cyan-500/20 transition-all"
+            >
+              <div>
+                <h2 className="text-xl font-bold mb-1 text-white">{d.medicineName}</h2>
+                <p className="text-sm text-gray-300">Qty: {d.quantity}</p>
+                <p className="text-sm text-gray-400">Expiry: {dayjs(d.expiryDate).format('MMM D, YYYY')}</p>
+              </div>
 
-                {/* Medicine Info */}
-                <div>
-                  <h2 className="text-xl font-semibold">{d.medicineName}</h2>
-                  <p className="text-gray-300">Qty: {d.quantity}</p>
-                  <p className="text-gray-300">
-                    Expiry: {dayjs(d.expiryDate).format('MMM D, YYYY')}
-                  </p>
-                </div>
-
-                {/* Status & QR */}
-                <div className="flex flex-col items-end gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      getTag(d.expiryDate) === 'Expired'
-                        ? 'bg-red-600'
-                        : getTag(d.expiryDate) === 'Expiring Soon'
-                        ? 'bg-yellow-500'
-                        : 'bg-green-600'
-                    }`}
-                  >
-                    {getTag(d.expiryDate)}
+              {/* Status Section */}
+              {d.qrCode ? (
+                <div className="mt-4 space-y-3">
+                  <span className="inline-block bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-semibold text-center">
+                    Requested
                   </span>
-                  {d.qrCode && (
-                    <code className="font-mono text-sm break-all text-gray-200">
-                      {d.qrCode}
-                    </code>
-                  )}
+                  <p className="bg-gray-800 text-white text-xs p-2 rounded-xl break-words font-mono">
+                    {d.qrCode}
+                  </p>
+                  <button
+                    onClick={() => confirmHandover(d.id)}
+                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-center text-white rounded-xl transition"
+                  >
+                    Confirm Handover
+                  </button>
                 </div>
-              </motion.div>
-            ))
-          )}
+              ) : (
+                <span
+                  className={`inline-block mt-4 px-3 py-1 rounded-full text-xs text-center font-semibold ${
+                    getTag(d.expiryDate) === 'Expired'
+                      ? 'bg-red-600'
+                      : getTag(d.expiryDate) === 'Expiring Soon'
+                      ? 'bg-yellow-400 text-black'
+                      : 'bg-emerald-500'
+                  }`}
+                >
+                  {getTag(d.expiryDate)}
+                </span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-    </motion.div>
-  )
+    </div>
+  );
 }
-
-export default DonorDashboard

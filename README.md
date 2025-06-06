@@ -1,11 +1,10 @@
 # Vionex
 
-[![Repo Size](https://img.shields.io/github/repo-size/suhasbm09/Vionex)](https://github.com/suhasbm09/Vionex)  
-[![License](https://img.shields.io/github/license/suhasbm09/Vionex)](https://github.com/suhasbm09/Vionex/blob/main/LICENSE)
-
 A **decentralized**, **AI-powered** platform bridging surplus and scarcity in healthcare.  
-Donors can contribute medicines, and NGOs request exactly what they need—the matching is handled by an AI microservice and all transactions (confirmations & feedback) are immutably logged on Solana Devnet.
+Donors contribute medicines, and NGOs request what they need - AI handles the matching, and Solana logs everything immutably.
 
+
+![Vionex Screenshot](./frontend/vionex-frontend/src/assets/vionex_preview.png)
 ---
 
 ## 📋 Table of Contents
@@ -23,57 +22,51 @@ Donors can contribute medicines, and NGOs request exactly what they need—the m
   - [7. Run Services](#7-run-services)  
 - [Usage](#-usage)  
 - [Project Structure](#-project-structure)  
-- [Contributing](#-contributing)  
-- [License](#-license)  
-- [Contact](#-contact)  
 
 ---
 
 ## 🌟 Features
 
-- **Donor Portal**  
-  - Sign up / log in via email  
-  - Create, list, and manage medicine donations  
-  - QR-code based handover verification  
+- **Donor Portal**
+  - Email-based login
+  - Add donations with QR-based handover
+  - Auto-track donation delivery
 
-- **NGO Portal**  
-  - Sign up / log in via email  
-  - AI-powered matching of available donations  
-  - Request items with on-chain confirmation & feedback  
-  - Immutable feedback logging on Solana Devnet  
+- **NGO Portal**
+  - Profile-based medicine requests
+  - AI-recommended matches
+  - Feedback & Solana on-chain logging
 
-- **AI Matcher**  
-  - Flask microservice using fraud detection & match scoring  
-  - Real-time recommendations based on expiry, quantity, location  
+- **AI Matcher**
+  - Flask microservice
+  - Fraud scoring + smart match scoring
 
-- **Blockchain Logging**  
-  - Anchor/Rust smart contract records confirmations  
-  - Backend serializes & submits Borsh-encoded transactions  
-  - View transaction on Solscan Devnet  
+- **Solana Integration**
+  - Anchor smart contract on Devnet
+  - Borsh serialization
+  - Transparent public transaction log
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer           | Technology                                    |
-| --------------- | --------------------------------------------- |
-| Frontend        | React · TailwindCSS · Framer Motion · Vite     |
-| UI Icons        | lucide-react                                   |
-| Routing & State | React Router · React Context                   |
-| Backend         | Node.js · Express · Firebase Admin             |
-| Blockchain      | Solana Devnet · @solana/web3.js · Borsh        |
-| Smart Contracts | Anchor (Rust)                                  |
-| AI Matching     | Python · Flask · pandas                        |
+| Layer           | Technology                                   |
+| --------------- | -------------------------------------------- |
+| Frontend        | React · TailwindCSS · Vite · Framer Motion   |
+| Backend         | Node.js · Express · Firebase Admin SDK       |
+| Blockchain      | Solana Devnet · Anchor · web3.js             |
+| Smart Contract  | Anchor (Rust)                                |
+| AI Matcher      | Python · Flask · pandas                      |
 
 ---
 
 ## 📋 Prerequisites
 
-- **Node.js** v16+ & **npm**  
-- **Python** 3.8+  
-- **Solana CLI** & **Anchor CLI**  
-- **Firebase** project with service account JSON  
-- **jq** (for IDL patching, optional)
+- Node.js v16+
+- Python 3.8+
+- Solana CLI + Anchor CLI
+- Firebase project (with Firestore + Service Account)
+- jq (optional, for patching)
 
 ---
 
@@ -84,112 +77,149 @@ Donors can contribute medicines, and NGOs request exactly what they need—the m
 ```bash
 git clone https://github.com/suhasbm09/Vionex.git
 cd Vionex
+```
+### 2. Configure Environment
 
-2. Configure Environment
-
-Create a .env in backend/:
-
-# backend/.env
+Create backend/.env:
+```bash
 FIREBASE_SERVICE_ACCOUNT=./serviceAccountKey.json
 SOLANA_KEYPAIR=./vionex-keypair.json
-ANCHOR_PROGRAM_ID=9dkwNagtgEGXme8zZfSvwtTwoTvG6thwhWmyohkrooGY
-
-3. Install Dependencies
+ANCHOR_PROGRAM_ID=<Your_Deployed_Anchor_Program_ID>
+```
+### 3. Install Dependencies
 
 # Frontend
+```bash
 cd frontend
 npm install
+```
 
 # Backend
+```bash
 cd ../backend
-npm install express@4 cors firebase-admin @solana/web3.js borsh axios
+npm install
+```
 
 # AI Matcher
+```bash
 cd ../ai_matcher
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
 
-4. Firebase Setup
+### 4. Firebase Setup
 
-    Create a Firebase project.
+    Create Firebase project
 
-    Generate a service account JSON and save as backend/serviceAccountKey.json.
+    Add Firestore (Native mode)
 
-    Enable Firestore in “Native” mode.
+    Generate service account JSON → save as backend/serviceAccountKey.json
 
-5. Solana & Anchor Setup
+### 5. Solana & Anchor Setup
 
-# Install Solana CLI
+# Install Solana
+```bash
 sh -c "$(curl -sSfL https://release.solana.com/v1.14.17/install)"
+solana config set --url https://api.devnet.solana.com
+```
 
 # Install Anchor
+```bash
 cargo install --git https://github.com/coral-xyz/anchor --tag v0.28.0 anchor-cli --locked
+```
 
-# Login & set Devnet
-solana config set --url https://api.devnet.solana.com
+### 6. Build & Deploy Anchor Program
 
-6. Build & Deploy Anchor Program
-
+```bash
 cd solana/smart_contract
 anchor build
 anchor deploy --provider.cluster devnet
-# Copy generated program ID into backend/.env ANCHOR_PROGRAM_ID
+```
+  > Copy the deployed program ID into backend/.env as ANCHOR_PROGRAM_ID.
 
-7. Run Services
+### 7. Run Services
 
-# 1. AI Matcher (port 5001)
+# AI Matcher (port 5001)
+```bash
 cd ai_matcher
 source .venv/bin/activate
 flask run --port 5001
+```
 
-# 2. Backend (port 5000)
+# Backend (port 5000)
+```bash
 cd ../backend
 node app.js
+```
 
-# 3. Frontend (port 5173)
+# Frontend (port 5173)
+```bash
 cd ../frontend
 npm run dev
+```
 
-🎯 Usage
+---
+## 🎯 Usage
 
-    Donor:
+- 🧍 Donor Flow
 
-        Visit http://localhost:5173 → “I’m a Donor” → log in / set up profile → dashboard → + New Donation → Generate QR.
+    Go to / → "I’m a Donor"
 
-    NGO:
+    Setup profile → Add donation → QR code generated
 
-        Visit http://localhost:5173 → “I’m an NGO” → log in / set up profile → AI-recommended matches → Request → Confirm handover → Provide feedback.
+    Wait for NGO to request → Confirm handover
 
-    Blockchain:
+- 🏥 NGO Flow
 
-        After feedback, click “View on Solscan” to inspect the transaction on Devnet.
+    Go to / → "I’m an NGO"
 
-📂 Project Structure
+    Setup profile → AI suggestions appear
 
+    Request → Confirm delivery → Give feedback
+
+- 🔗 Blockchain Logs
+
+    After feedback, view Solana Devnet logs via Solscan link
+
+---
+
+## 📂 Project Structure
+
+```bash
 Vionex/
-│
-├─ ai_matcher/            # Python Flask service for AI matching & fraud detection
-│  └─ app.py
-│
-├─ frontend/              # React + Vite + Tailwind client
-│  └─ src/
-│     ├─ pages/
-│     ├─ components/
-│     └─ index.css
-│
-├─ backend/               # Node.js + Express server
-│  ├─ config/
-│  │  └─ firebase.js
-│  ├─ controllers/
-│  ├─ routes/
-│  ├─ solanaLogger.js     # Raw Borsh + web3.js integration
-│  ├─ serviceAccountKey.json
-│  └─ app.js
-│
-└─ solana/
-   └─ smart_contract/     # Anchor framework Rust program
-      └─ programs/
-         └─ smart_contract/
-            └─ src/lib.rs
+├─ ai_matcher/               # Python Flask AI logic
+├─ backend/                  # Node.js + Firebase + Solana
+├─ frontend/                 # Vite + React + Tailwind frontend
+├─ solana/
+│  └─ smart_contract/        # Anchor smart contract
+├─ .gitgnore
+└─ README.md                 # You're here :)
+
+```
+---
+
+## 🤝 Contributors
+
+- [@suhasbm09](https://github.com/suhasbm09)  
+- [@ishan-100](https://github.com/ishan-100)  
+- [@jaswanth1797](https://github.com/jaswanth1797)  
+- [@Rajatha-M-Deshmuk](https://github.com/Rajatha-M-Deshmuk)  
+- [@Surajmanjunatha](https://github.com/Surajmanjunatha)  
+- [@vymohith](https://github.com/vymohith)
+
+---
+
+## 📬 Contact
+
+Feel free to connect or reach out for collaborations, improvements, or queries:  
+📧 **suhasbm09@gmail.com**  
+🌐 [github.com/suhasbm09/Vionex](https://github.com/suhasbm09/Vionex)
+
+---
+
+<p align="center">
+  Built with 💡, AI ⚙️, and Solana 🔗 — to make impact traceable.
+</p>
+
 

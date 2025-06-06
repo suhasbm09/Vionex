@@ -1,18 +1,14 @@
 // backend/routes/donorRoutes.js
 const express = require('express');
-const c       = require('../controllers/donorController');
+const ctrl    = require('../controllers/donorController');
 const router  = express.Router();
 
-// Donor profile
-router.post('/profile',             c.createDonorProfile);
-router.get('/email/:email',         c.getDonorByEmail);
-router.get('/:id/profile',          c.getDonorProfile);
-
-// Donations CRUD
-router.get('/:id/donations',        c.getDonorDonations);
-router.post('/:id/donations',       c.addDonation);
-
-// Confirm donation (handover)
-router.patch('/:id/donations/confirm', c.confirmDonation);
+router.post('/profile',               ctrl.createDonorProfile);
+router.get('/email/:email',           ctrl.getDonorByEmail);
+router.get('/:id/profile',            ctrl.getDonorProfile);
+router.get('/:id/donations',          ctrl.getDonorDonations);
+router.post('/:id/donations',         ctrl.addDonation);
+// single endpoint for both NGO request & Donor delivery
+router.patch('/:id/donations/confirm', ctrl.confirmDonation);
 
 module.exports = router;

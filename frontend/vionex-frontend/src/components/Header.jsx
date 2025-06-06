@@ -1,94 +1,44 @@
-// src/components/Header.jsx
-import React, { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Sun, Moon, Menu, X } from 'lucide-react'
+import React from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Header() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
-  const isLoggedIn = Boolean(user.id)
-  const displayName = user.displayName
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const pages = [
-    { label: '🏠 Home', path: '/' },
-    { label: '📦 Donor', path: '/donor-dashboard' },
-    { label: '🏥 NGO', path: '/ngo-dashboard' },
-    { label: '👤 Edit Donor', path: '/donor-profile' },
-    { label: '📝 Edit NGO', path: '/ngo-profile' },
-  ]
-
-  const toggleDark = () => {
-    setDarkMode(d => !d)
-    document.documentElement.classList.toggle('dark', !darkMode)
-  }
-
-  const handleAuth = () => {
-    localStorage.removeItem('user')
-    navigate('/')
-  }
+    { label: "🏠 Home", path: "/" },
+    { label: "🕑 History", path: "/history" },
+    { label: "🏆 Leaderboard", path: "/leaderboard" }, // dummy
+  ];
 
   return (
-    <>
-      <header className="fixed inset-x-4 top-4 z-50 flex justify-between items-center p-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg text-white">
-        <div className="flex items-center gap-4">
-          <button onClick={() => setSidebarOpen(o => !o)} className="p-2">
-            {sidebarOpen ? <X size={24}/> : <Menu size={24}/>}
-          </button>
-          <div className="text-2xl font-bold tracking-wide">Vionex</div>
-        </div>
+    <header className="fixed top-6 left-8 right-8 z-50 rounded-2xl shadow-xl glass bg-gradient-to-r from-cyan-900/60 via-fuchsia-900/50 to-purple-800/60 backdrop-blur-xl px-8 h-20 flex items-center justify-between animate-slide-down border border-white/10">
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={toggleDark}
-            className="p-2 bg-white/10 rounded-full border border-white/20 transition"
-            title="Toggle theme"
+      {/* Brand */}
+      <div
+        onClick={() => navigate("/")}
+        className="text-3xl font-extrabold text-white cursor-pointer tracking-wide"
+      >
+        Vionex
+      </div>
+
+      {/* Navigation */}
+      <nav className="hidden md:flex space-x-10 text-sm font-medium">
+        {pages.map(({ label, path }) => (
+          <Link
+            key={path}
+            to={path}
+            className={`group relative text-white/90 transition duration-300 ease-in-out ${
+              pathname === path ? "text-white" : ""
+            }`}
           >
-            {darkMode ? <Sun size={20}/> : <Moon size={20}/>}
-          </button>
+            {label}
+            <span className="absolute left-1/2 bottom-[-4px] w-0 h-[2px] bg-cyan-400 transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
+          </Link>
+        ))}
+      </nav>
 
-          {isLoggedIn ? (
-            <button
-              onClick={handleAuth}
-              className="px-4 py-1 bg-red-600 hover:bg-red-500 rounded-full transition"
-            >
-              Logout
-            </button>
-          ) : (
-            <button
-              onClick={() => navigate('/')}
-              className="px-4 py-1 bg-indigo-600 hover:bg-indigo-500 rounded-full transition"
-            >
-              Login
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* Sidebar */}
-      {sidebarOpen && (
-        <aside className="fixed inset-y-0 left-0 w-64 p-6 bg-white/10 backdrop-blur-xl border-r border-white/20 shadow-2xl text-white z-40">
-          <nav className="flex flex-col gap-2">
-            {pages.map(p => (
-              <Link
-                key={p.path}
-                to={p.path}
-                onClick={() => setSidebarOpen(false)}
-                className={`px-4 py-2 rounded-lg transition ${
-                  pathname === p.path
-                    ? 'bg-indigo-600 text-white'
-                    : 'hover:bg-white/20'
-                }`}
-              >
-                {p.label}
-              </Link>
-            ))}
-          </nav>
-        </aside>
-      )}
-    </>
-  )
+      
+    </header>
+  );
 }
