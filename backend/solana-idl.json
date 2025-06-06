@@ -1,0 +1,237 @@
+{
+  "address": "CW1KiQ7GtGfCNu4VH8rv7NKnXChUYarHoBy2sRht8NBa",
+  "metadata": {
+    "name": "vionex_impact",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize_counter",
+      "docs": [
+        "One-time: initialize the counter at 0."
+      ],
+      "discriminator": [
+        67,
+        89,
+        100,
+        87,
+        231,
+        172,
+        35,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "impact_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  109,
+                  112,
+                  97,
+                  99,
+                  116,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "log_impact",
+      "docs": [
+        "Logs a new impact record.",
+        "- Reads the current counter.",
+        "- Creates a new `Impact` PDA using seed [\"impact\", count.to_le_bytes()].",
+        "- Stores `donor`, `ngo`, `medicine`, `quantity`, and `timestamp` inside that account.",
+        "- Increments the counter."
+      ],
+      "discriminator": [
+        219,
+        92,
+        27,
+        216,
+        142,
+        118,
+        184,
+        24
+      ],
+      "accounts": [
+        {
+          "name": "impact_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  109,
+                  112,
+                  97,
+                  99,
+                  116,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "impact",
+          "docs": [
+            "The new Impact record, PDA = [\"impact\", counter.count.to_le_bytes()]"
+          ],
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "donor",
+          "type": "string"
+        },
+        {
+          "name": "ngo",
+          "type": "string"
+        },
+        {
+          "name": "medicine",
+          "type": "string"
+        },
+        {
+          "name": "quantity",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "i64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Impact",
+      "discriminator": [
+        131,
+        227,
+        81,
+        131,
+        131,
+        119,
+        70,
+        156
+      ]
+    },
+    {
+      "name": "ImpactCounter",
+      "discriminator": [
+        89,
+        226,
+        89,
+        203,
+        225,
+        79,
+        173,
+        188
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "CounterOverflow",
+      "msg": "Counter overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "Impact",
+      "docs": [
+        "The on-chain Impact record.",
+        "Fixed space for each string + two integers."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "donor",
+            "type": "string"
+          },
+          {
+            "name": "ngo",
+            "type": "string"
+          },
+          {
+            "name": "medicine",
+            "type": "string"
+          },
+          {
+            "name": "quantity",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ImpactCounter",
+      "docs": [
+        "The singleton account that tracks how many Impact records have been created."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
