@@ -213,7 +213,7 @@ Vionex/
 ## 📬 Contact
 
 Feel free to connect or reach out for collaborations, improvements, or queries:  
-📧 **suhasbm09@gmail.com**  
+📧 **suhaasbm2004@gmail.com**  
 🌐 [github.com/suhasbm09/Vionex](https://github.com/suhasbm09/Vionex)
 
 ---
