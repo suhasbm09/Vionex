@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.98.2",
+    "axios": "^1.9.0",
+    "body-parser": "^2.2.0",
+    "borsh": "^2.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "firebase": "^11.8.1",
+    "firebase-admin": "^13.4.0"
+  }
+}
