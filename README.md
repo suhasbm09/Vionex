@@ -102,7 +102,7 @@ npm install
 
 # AI Matcher
 ```bash
-cd ../ai_matcher
+cd ../backend/ai_matcher
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -187,9 +187,9 @@ npm run dev
 ## 📂 Project Structure
 
 ```bash
-Vionex/
-├─ ai_matcher/               # Python Flask AI logic
+Vionex/              
 ├─ backend/                  # Node.js + Firebase + Solana
+│  └─ ai_matcher/            # Python Flask AI logic               
 ├─ frontend/                 # Vite + React + Tailwind frontend
 ├─ solana/
 │  └─ smart_contract/        # Anchor smart contract
